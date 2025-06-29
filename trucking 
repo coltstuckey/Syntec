@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>CDs Trucking - Employee Portal</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #eef2f3;
+      text-align: center;
+      padding: 40px;
+    }
+    .container {
+      max-width: 400px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+    h2 {
+      color: #333;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+    }
+    #timer {
+      font-size: 18px;
+      margin-top: 10px;
+      color: green;
+    }
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container" id="loginSection">
+    <h2>Employee Login - CDs Trucking</h2>
+    <input type="text" id="employeeName" placeholder="Full Name (e.g., Colt Stuckey)" />
+    <input type="password" id="password" placeholder="Password" />
+    <button onclick="login()">Login</button>
+    <p id="loginMessage" style="color:red;"></p>
+  </div>
+
+  <div class="container hidden" id="dashboardSection">
+    <h2>Welcome, <span id="employeeDisplay"></span></h2>
+    <button id="clockInBtn" onclick="clockIn()">Clock In</button>
+    <button id="clockOutBtn" class="hidden" onclick="clockOut()">Clock Out</button>
+    <div id="timer" class="hidden">Timer: 0h 0m 0s</div>
+    <p id="statusMessage"></p>
+  </div>
+
+  <script>
+    const employees = {
+      "colt stuckey": {
+        empNumber: "001",
+        password: "colt001Stuckey_CDsTrucking"
+      }
+    };
+
+    let timerInterval;
+    let startTime;
+
+    function login() {
+      const name = document.getElementById('employeeName').value.trim().toLowerCase();
+      const password = document.getElementById('password').value;
+
+      if (employees[name] && password === employees[name].password) {
+        document.getElementById('loginSection').classList.add('hidden');
+        document.getElementById('dashboardSection').classList.remove('hidden');
+        document.getElementById('employeeDisplay').textContent = name
+          .split(' ')
+          .map(w => w[0].toUpperCase() + w.substring(1))
+          .join(' ');
+      } else {
+        document.getElementById('loginMessage').innerText = "Invalid name or password.";
+      }
+    }
+
+    function clockIn() {
+      startTime = new Date();
+      document.getElementById('statusMessage').innerText = "Clocked in at " + startTime.toLocaleTimeString();
+      document.getElementById('clockInBtn').classList.add('hidden');
+      document.getElementById('clockOutBtn').classList.remove('hidden');
+      document.getElementById('timer').classList.remove('hidden');
+
+      timerInterval = setInterval(updateTimer, 1000);
+    }
+
+    function clockOut() {
+      const endTime = new Date();
+      clearInterval(timerInterval);
+
+      const elapsed = Math.floor((endTime - startTime) / 1000);
+      const hours = Math.floor(elapsed / 3600);
+      const minutes = Math.floor((elapsed % 3600) / 60);
+      const seconds = elapsed % 60;
+
+      document.getElementById('statusMessage').innerText = `Clocked out at ${endTime.toLocaleTimeString()} - Total: ${hours}h ${minutes}m ${seconds}s`;
+      document.getElementById('timer').classList.add('hidden');
+      document.getElementById('clockOutBtn').classList.add('hidden');
+    }
+
+    function updateTimer() {
+      const now = new Date();
+      const elapsed = Math.floor((now - startTime) / 1000);
+      const h = Math.floor(elapsed / 3600);
+      const m = Math.floor((elapsed % 3600) / 60);
+      const s = elapsed % 60;
+      document.getElementById('timer').innerText = `Timer: ${h}h ${m}m ${s}s`;
+    }
+  </script>
+</body>
+</html>
